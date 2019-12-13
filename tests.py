@@ -32,10 +32,11 @@ def compareCollections(refCollection,newCollection):
        
     for array,col in zip(arrays,columns):
         resultPt = pd.concat(array)
-        resultPt.plot.hist(title=col,bins=400,range=(-2,2.))
-        plt.xlabel('%s_ref-%s_new/ %s_ref$'%(col,col,col))
+        resultPt.plot.hist(title=col,bins=400,range=(-1.,1.))
+        plt.xlabel('%s_ref-%s_new/ %s_ref'%(col,col,col))
         plt.ylabel('Number of jets')
         plt.savefig(col+".png")
+        plt.clf()
     plt.plot(sigmaN)
     plt.xlabel('N_ref-N_new/N_ref')
     plt.ylabel('Number of jets')
