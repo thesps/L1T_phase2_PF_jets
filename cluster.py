@@ -1,9 +1,9 @@
 import util, algos
-import tests
+from tests import compareCollections
 import argparse
 import pandas as pd
 import sys
-from tests import compareCollections
+
 
 def getEvents(input,loadFromh5=False):
     evs, jets = pd.DataFrame(),pd.DataFrame()
@@ -29,6 +29,6 @@ if __name__ == "__main__":
   
   events, ak4jets = getEvents(args.input,args.fromh5)
   jets = algos.seedConeJetsAllEvents(events,jet_threshold=5.)
-  histos = compareCollections(ak4jets,jets)
+  compareCollections(ak4jets,jets)
   
   

@@ -1,7 +1,6 @@
 import pandas as pd
 import uproot
 import numpy as np
-import h5py, tables
 
 def loadFromFile(filename,writeToh5=False):
     f = uproot.open(filename)
