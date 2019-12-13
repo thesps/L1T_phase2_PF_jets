@@ -29,6 +29,13 @@ if __name__ == "__main__":
   
   events, ak4jets = getEvents(args.input,args.fromh5)
   jets = algos.seedConeJetsAllEvents(events,jet_threshold=5.)
-  compareCollections(ak4jets,jets)
+  residual_Nreconstructed = compareCollections(ak4jets,jets)
+  print("On average, number of reconstructed jets 1 - N_new/N_ref = %f" %residual_Nreconstructed)
+  if residual_Nreconstructed<0.:
+      print("Reconstruct too many jets with new algorithm! Please find out why.")
+  elif residual_Nreconstructed>0:
+      print("Reconstruct too few jets with new algorithm! Please find out why.")
+  else:
+      print("You're cheating! Nothing is this good. Go back.")
   
   
