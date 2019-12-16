@@ -2,7 +2,7 @@ import pandas as pd
 import uproot
 import numpy as np
 
-def loadFromFile(filename):
+def loadFromFile(filename,writeToh5=False):
     f = uproot.open(filename)
     puppi_tree = 'Events/l1tPFCandidates_l1pfCandidates_Puppi_RESP./l1tPFCandidates_l1pfCandidates_Puppi_RESP.obj/'
     p4_tree = puppi_tree + 'l1tPFCandidates_l1pfCandidates_Puppi_RESP.obj.m_state.p4Polar_.fCoordinates'
@@ -22,6 +22,10 @@ def loadFromFile(filename):
     index = np.array([i for i, ev in enumerate(pt) for j in range(len(ev))]).flatten()
     jets = pd.DataFrame({'i' : index, 'pt' : pt.flatten(), 'eta' : eta.flatten(),      'phi' : phi.flatten()})
     jets.set_index('i', inplace=True, drop=True)
+    if writeToh5:
+        with pd.HDFStore(filename.replace('.root','.h5'),mode='w') as f:
+            f['events'] = events
+            f['jets']   = jets
     return events, jets
 
 def plotJetCompare(particles, jets1, jets2, label1='Jets 1', label2='Jets 2', radius=0.4):
