@@ -44,7 +44,7 @@ def plotJetCompare(particles, jets1, jets2, label1='Jets 1', label2='Jets 2', ra
     for iJ, j in enumerate(jets2.iterrows()):
          j = j[1]
          plt.plot(j['eta'], j['phi'], marker='x', color='orange')
-         circle = Circle((j['eta'], j['phi']), radius=radius, edgecolor='orange', fill=False)
+         circle = Circle((j['eta'], j['phi']), radius=radius, edgecolor='orange', fill=False, linestyle='--')
          ax.add_patch(circle)
     patch1 = mpatches.Patch(color='blue', label=label1)
     patch2 = mpatches.Patch(color='orange', label=label2)
