@@ -23,3 +23,28 @@ def loadFromFile(filename):
     jets = pd.DataFrame({'i' : index, 'pt' : pt.flatten(), 'eta' : eta.flatten(),      'phi' : phi.flatten()})
     jets.set_index('i', inplace=True, drop=True)
     return events, jets
+
+def plotJetCompare(particles, jets1, jets2, label1='Jets 1', label2='Jets 2', radius=0.4):
+    import matplotlib.pyplot as plt
+    import matplotlib.patches as mpatches
+    from matplotlib.patches import Circle
+    scale = 1.
+    plt.figure()
+    ph = plt.scatter(particles['eta'], particles['phi'], s = particles['pt'] / scale, label='Particles')
+    ax = plt.gca()
+    for iJ, j in enumerate(jets1.iterrows()):
+         j = j[1]
+         plt.plot(j['eta'], j['phi'], marker='x', color='blue')
+         circle = Circle((j['eta'], j['phi']), radius=radius, edgecolor='blue', fill=False)
+         ax.add_patch(circle)
+    for iJ, j in enumerate(jets2.iterrows()):
+         j = j[1]
+         plt.plot(j['eta'], j['phi'], marker='x', color='orange')
+         circle = Circle((j['eta'], j['phi']), radius=radius, edgecolor='orange', fill=False)
+         ax.add_patch(circle)
+    patch1 = mpatches.Patch(color='blue', label=label1)
+    patch2 = mpatches.Patch(color='orange', label=label2)
+    plt.legend(handles=[ph, patch1, patch2])
+    plt.axis('equal')
+    plt.xlabel('eta')
+    plt.ylabel('phi')
