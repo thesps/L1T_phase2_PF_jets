@@ -1,12 +1,7 @@
 import pandas as pd
 import numpy as np
-from time import sleep
 import matplotlib.pyplot as plt
-import sys
 from scipy.spatial.distance import cdist
-
-def deltaR(a, b):
-    return np.sqrt((a['eta'] - b['eta'])**2 + (a['phi'] - b['phi'])**2)
     
 outpath = "/eos/home-t/thaarres/www/L1T_phase2_PF_jets/"
     
