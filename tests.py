@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 import sys
 from scipy.spatial.distance import cdist
 
+def deltaR(a, b):
+    return np.sqrt((a['eta'] - b['eta'])**2 + (a['phi'] - b['phi'])**2)
+    
 outpath = "/eos/home-t/thaarres/www/L1T_phase2_PF_jets/"
     
 def getPairs(ref,new):
@@ -12,9 +15,10 @@ def getPairs(ref,new):
     for ev in range(0,len(ref)):
         ref_ev = ref.get_group(ev)
         new_ev = new.get_group(ev)
-        distance_array = cdist(ref_ev.iloc[:,:2], new_ev.iloc[:,:2], metric='minkowski') #returns pairwise shape=(ref,new) distance matrix (new <= ref)
-        np.set_printoptions(suppress=True,precision=3)
-        minInRows = np.array(np.argmin(distance_array, axis=1)) # Get the minimum values of each row i.e. along axis 1, takes minimum distance with new jets and "removes" the rest
+        distance_array = cdist(ref_ev.iloc[:,:2], new_ev.iloc[:,:2], metric='minkowski', p=2) #returns pairwise distance matrix ( shape=(ref,new), new <= ref)              
+        # np.set_printoptions(suppress=True,precision=3)
+        # print distance_array
+        minInRows = np.array(np.argmin(distance_array, axis=1)) #Finds minimum distance between reference object and each new object
         selectedJets = new_ev.iloc[minInRows,:]
         frames = [ref_ev,selectedJets]
         result = pd.concat(frames,axis=1,sort=False)
