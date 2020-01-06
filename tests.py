@@ -54,12 +54,12 @@ def compareCollections(refCollection,newCollection):
     
     refCollection_event = refCollection.groupby(refCollection.index)
     newCollection_event = newCollection.groupby(newCollection.index)
+    
     sigmaN = (refCollection_event.size()- newCollection_event.size())/refCollection_event.size()
+    
     drawDataframe(sigmaN,'residuals_Njet','$Njets_{ref}-Njets_{new}/Njets_{ref}$')
     drawMultipleDataFrames ([refCollection_event.size(),newCollection_event.size() ],'Njets',['AK4','Seed'],'$N_{jets}$')
-    print(" ---- Matching objects from old and new collection (dR=sqrt(dEta^2+dPhi^2)), returning the result in joint dataframe")
     matchedJetPairs = getPairs(refCollection_event,newCollection_event)
-    print(" ---- Columns belonging to the reference collection are given prefix 'ref_*', and the new collection 'new_*' ")
     
     columns = refCollection.columns
     fancynames = ['$\eta$','$\phi','$p_T$']
@@ -71,6 +71,6 @@ def compareCollections(refCollection,newCollection):
         drawDataframe(df,'residuals_'+col,'$%s_{ref}-%s_{new}/%s_{ref}$'%(col,col,col))
         drawMultipleDataFrames ([matchedJetPairs['ref_'+col],matchedJetPairs['new_'+col] ],col,['AK4','Seed'],name,log=log)
 
-    print("Inspect all plots at https://thaarres.web.cern.ch/thaarres/L1T_phase2_PF_jets/")    
+    print("Inspect histograms at https://thaarres.web.cern.ch/thaarres/L1T_phase2_PF_jets/")    
      
    
