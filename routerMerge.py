@@ -131,10 +131,11 @@ def Route16To64(x, start):
     n = np.min(np.argwhere(x == 0)) if sum(x == 0) > 0 else 16
     a = np.zeros(16)
     a[0:n] = np.arange(start, start +n, 1)
-    print("x : {}".format(x))
-    print("a : {}".format(a))
     la0 = (a % 4).astype('int')
     #la0 = ((a+ia) % 4).astype('int')
+    print("x0  : {}".format(x))
+    print("xa0 : {}".format(a))
+    print("la0 : {}".format(la0))
 
     y_0 = np.array([])
     a_0 = np.array([])
@@ -144,8 +145,8 @@ def Route16To64(x, start):
         y_0 = np.append(y_0, yy)
         a_0 = np.append(a_0, aa)
 
-    print("x : {}".format(y_0))
-    print("a : {}".format(a_0))
+    print("y0  : {}".format(y_0))
+    print("ya0 : {}".format(a_0))
 
     x_1 = np.zeros(16)
     a_1 = np.zeros(16)
@@ -154,17 +155,21 @@ def Route16To64(x, start):
             x_1[4*i + j] = y_0[4*j + i]
             a_1[4*i + j] = a_0[4*j + i]
 
-    print("x : {}".format(x_1))
-    print("a : {}".format(a_1))
+    print("x1  : {}".format(x_1))
+    print("xa1 : {}".format(a_1))
 
     y_1 = np.array([])
     a_2 = np.array([])
     la1 = (a_1 % 16) // 4
+    print("la1 : {}".format(la1))
     for i in range(4):
         l, h = 4 * i, 4 * (i + 1)
         yy, aa = RouteToUniqueAddr(x_1[l:h], la1[l:h], a_1[l:h])
         y_1 = np.append(y_1, yy)
         a_2 = np.append(a_2, aa)
+
+    print("y1  : {}".format(y_1))
+    print("ya1 : {}".format(a_2))
 
     x_2 = np.zeros(16)
     a_3 = np.zeros(16)
@@ -173,8 +178,8 @@ def Route16To64(x, start):
             x_2[4*i + j] = y_1[4*j + i]
             a_3[4*i + j] = a_2[4*j + i]
 
-    print("x : {}".format(x_2))
-    print("a : {}".format(a_3))
+    print("x2  : {}".format(x_2))
+    print("xa2 : {}".format(a_3))
 
     y_2 = np.zeros(64)
     # Do groups of 4 (one from each quarter
@@ -187,3 +192,94 @@ def Route16To64(x, start):
                 y_2[iy] = x_2[i]
 
     return y_2
+
+def Merge2x32To64(xa, xb):
+
+    def f(i, j):
+        # The router layer mixing
+        ij = 8 * i + j
+        a, b = ij // 4, ij % 4
+        ab = 4 * b + a
+        a, b = ab // 8, ab % 8
+        return a, b
+
+    n = np.min(np.argwhere(xa == 0)) if sum(xa == 0) > 0 else 32
+    a = np.arange(n, n+32, 1)
+    # shouldn't happen
+    a[a > 63] = 0
+
+    la0 = (a % 8).astype('int')
+    #la0 = ((a+ia) % 4).astype('int')
+    print("x0  : {}".format(xb))
+    print("xa0 : {}".format(a))
+    print("la0 : {}".format(la0))
+
+    # Do 4 groups of 8
+    y_0 = np.array([])
+    a_0 = np.array([])
+    for i in range(4):
+        l, h = int(8 * i), int(8 * (i + 1))
+        yy, aa = RouteToUniqueAddr(xb[l:h], la0[l:h], a[l:h])
+        y_0 = np.append(y_0, yy)
+        a_0 = np.append(a_0, aa)
+
+    print("y0  : {}".format(y_0))
+    print("ya0 : {}".format(a_0))
+
+    x_1 = np.zeros(32)
+    a_1 = np.zeros(32)
+    for i in range(4):
+        for j in range(8):
+            ia, ib = f(i,j)
+            x_1[8*i + j] = y_0[8*ia + ib]
+            a_1[8*i + j] = a_0[8*ia + ib]
+
+    print("x1  : {}".format(x_1))
+    print("xa1 : {}".format(a_1))
+
+    y_1 = np.array([])
+    a_2 = np.array([])
+    la1 = (a_1 // 4 + 4 * (a_1 % 2)) % 8
+    print("la1 : {}".format(la1))
+    for i in range(4):
+        l, h = 8 * i, 8 * (i + 1)
+        yy, aa = RouteToUniqueAddr(x_1[l:h], la1[l:h], a_1[l:h])
+        y_1 = np.append(y_1, yy)
+        a_2 = np.append(a_2, aa)
+
+    print("y1  : {}".format(y_1))
+    print("ya1 : {}".format(a_2))
+
+    x_2 = np.zeros(32)
+    a_3 = np.zeros(32)
+    for i in range(4):
+        for j in range(8):
+            ia, ib = f(i, j)
+            x_2[8*i + j] = y_1[8*ia + ib]
+            a_3[8*i + j] = a_2[8*ia + ib]
+
+    print("x2  : {}".format(x_2))
+    print("xa2 : {}".format(a_3))
+    # TEST
+    #x_2 = y_1
+    #a_3 = a_2
+
+    y_2 = np.zeros(64)
+    for i in range(64):
+        if a_3[i % 32] == i:
+            y_2[i] = x_2[i % 32]
+
+    # final route
+    y = np.zeros(64)
+    for i in range(64):
+        if i < 32:
+            if xa[i] != 0:
+                y[i] = xa[i]
+            elif y_2[i] != 0:
+                y[i] = y_2[i]
+        else:
+            if y_2[i] != 0:
+                y[i] = y_2[i]
+
+
+    return y
